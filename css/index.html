@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="./style.css">
+        <title>Music Player</title>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
+    </head>
+
+    <body>
+        <audio src="../assets/Ed_Sheeran_-_Perfect_(Naijay.com).mp3" onload="getCurrentTime()" id="audio"></audio>
+            <div class="container">
+                <div class="header__inner">
+                    <img id="logo" src="../assets/apple.png" width="50" alt="">
+                    <div class="list">
+                        <span id="track">1</span>/3
+                    </div>
+                </div>
+
+                <div class="outter">
+                <div class="first">
+                    <img src="../assets/xxx.jpeg" id="image" width="300px" alt="">
+                    <div class="volume">
+                        <span id="vol_text">90</span>
+                        <div id="volume" onclick="mute()" class="vol-icon"><i class="fa-solid fa-volume-high"></i></div>
+                        <input id="vol_slide" type="range"  in="0" max="100">  
+                    </div>
+                </div>
+
+                <div class="first">
+                    <h1 id="song_name">Perfect</h1>
+                    <h2 id="singer">Ed Sheeran</h2>
+                    <div class="actions">
+                        <button class="circ" onclick="prev()"><i class="fa-solid fa-backward-step"></i></button>
+                        <button class="circ" onclick="play()" id="play"><i class="fa-solid fa-play"></i></button>
+                        <button class="circ" onclick="next()"><i class="fa-solid fa-forward-step"></i></button>
+                    </div>
+                    <div>
+                    <input id="time_slide" type="range" min="0" max="100" value="0">
+                    <div id="time"><span id="now">00:00</span> <span id="total"></span></div>
+                </div>
+            </div>
+                
+
+
+            </div>
+           </div>
+
+    </body>
+    sqr
+
+    <script>
+        let init = document.getElementById('vol_slide')
+        let show_vol = document.getElementById('vol_text')
+
+
+        const r = document.getElementById('audio');
+        r.addEventListener('canplaythrough', () => {
+            const music= document.getElementById('audio')
+            let total = music.duration.toFixed(0);
+            let total_time = ((total/60).toFixed(0)<10?"0"+(total/60).toFixed(0):(total/60).toFixed(0))+":"+(total%60<10?"0"+(total%60):(total%60));
+            document.getElementById('total').innerHTML = total_time
+
+
+        })
+
+        show_vol.innerHTML = init.value;
+        init.oninput = function(){
+            show_vol.innerHTML= this.value;
+            audio.volume = this.value/100;
+        }
+        let temp;
+        function mute(){
+                if(audio.muted){
+                show_vol.innerHTML = temp;
+                init.value = temp;
+                audio.muted =false;
+                document.getElementById('volume').innerHTML=`<i class="fa-solid fa-volume-high">`;
+            }else{
+                temp = init.value;
+                show_vol.innerHTML = 0;
+                init.value = 0;
+                audio.muted = true;
+                document.getElementById('volume').innerHTML=`<i class="fa-solid fa-volume-xmark"></i>`;
+            }
+        }
+        let music= document.getElementById('audio')
+        
+        //    done
+        function play(){
+            if(audio.paused){
+                audio.play();
+                document.getElementById('play').innerHTML=`<i class="fa-solid fa-pause"></i>`;
+            }else{
+                audio.pause();
+                document.getElementById('play').innerHTML=`<i class="fa-solid fa-play"></i>`;
+            }
+        }
+
+        // will show times
+
+
+        let total = music.duration.toFixed(0);
+        let total_time = ((total/60).toFixed(0)<10?"0"+(total/60).toFixed(0):(total/60).toFixed(0))+":"+(total%60<10?"0"+(total%60):(total%60));
+
+        document.getElementById('total').innerHTML = total_time
+
+        let time = document.getElementById('time_slide')
+        time.oninput=function(){
+            let percent = this.value;
+            let now = (percent*total /100).toFixed(0);
+            let now_time = ((now/60).toFixed(0)<10?"0"+(now/60).toFixed(0):(now/60).toFixed(0))+":"+(now%60<10?"0"+(now%60):(now%60));
+            document.getElementById('now').innerHTML=now_time 
+            music.currentTime=now;
+        }
+
+        music.addEventListener('timeupdate',()=>{
+            const percent = music.currentTime/music.duration * 100;
+            let now = (percent*total /100).toFixed(0);
+            let now_time = ((now/60).toFixed(0)<10?"0"+(now/60).toFixed(0):(now/60).toFixed(0))+":"+(now%60<10?"0"+(now%60):(now%60));
+            document.getElementById('now').innerHTML=now_time
+            time.value=percent
+            console.log(percent)
+            console.log(now_time)
+            console.log(time)
+        })
+
+        var all_songs = [
+            {
+                id:0,
+                name:"Perfect",
+                path:"../assets/Ed_Sheeran_-_Perfect_(Naijay.com).mp3",
+                img:"../assets/xxx.jpeg",
+                singer:"Ed Sheeran"
+
+            },
+            {   id:1,
+                name:"Okay",
+                path:"../assets/Тима_Белорусских_Окей_трек_Tima_Belorusskih.m4a",
+                img:"../assets/second.png",
+                singer:"Тима Белорусских"
+
+            },
+            {   
+                id:2,
+                name:"One Dance",
+                path:"../assets/Drake_ft_Wizkid_Kyla_-_One_Dance_Olagist.co_.mp3",
+                img:"../assets/third.jpg",
+                singer:"Drake"
+
+            }
+        ]
+        
+        
+        function prev(){
+            const currentSong = document.getElementById('audio')
+            const currentAttribute = currentSong.getAttribute("src");
+            const findObject  = all_songs.find((song)=>song.path===currentAttribute);
+            let index = findObject.id;
+            if(index==0){
+                index = all_songs.length-1;
+            }else{
+                index--;
+            }
+            document.getElementById('track').innerHTML=index+1;
+            currentSong.pause();    
+            currentSong.setAttribute('src',all_songs[index].path);
+            currentSong.load();
+            currentSong.play();
+            document.getElementById('play').innerHTML=`<i class="fa-solid fa-pause"></i>`;
+            document.getElementById('image').setAttribute('src',all_songs[index].img)   
+            document.getElementById('song_name').innerHTML=all_songs[index].name;
+            document.getElementById('singer').innerHTML=all_songs[index].singer;
+
+            
+            
+
+
+        }
+
+        function next(){
+            const currentSong = document.getElementById('audio')
+            const currentAttribute = currentSong.getAttribute("src");
+            const findObject  = all_songs.find((song)=>song.path===currentAttribute);
+            let index = findObject.id;
+            if(index==all_songs.length-1){
+                index=0;
+            }else{
+                index++;
+            }
+            document.getElementById('track').innerHTML=index+1;
+            currentSong.pause();
+            currentSong.setAttribute('src',all_songs[index].path)
+            currentSong.load();
+            currentSong.play();
+            document.getElementById('play').innerHTML=`<i class="fa-solid fa-pause"></i>`;
+            document.getElementById('image').setAttribute('src',all_songs[index].img)
+            document.getElementById('song_name').innerHTML=all_songs[index].name;
+            document.getElementById('singer').innerHTML=all_songs[index].singer;
+
+
+    
+        }
+
+
+;</script>
+
+
+<!--     
+        <body>
+            
+        <div class="main">
+            <div class="header">
+            <p id="logo"><i class="fa-solid fa-music"></i></p>
+            <div class="show_song_no">
+                <p class="present">1</p>
+                <p>/</p>
+                <p id="total">3</p>
+            </div>
+            </div>
+
+            <div class="content">
+        leff part -->
+
+        <!-- <div class="left">
+            
+            <img id ="track_image" src="/music-player/assets/how-to-warm-up-your-singing-voice-1559238633.jpg" width="600px" >
+                <div class="volume">
+                    <p class="volume_show">90</p>
+                    <div>
+                        <i class="fa-solid fa-volume-high" id="volume_icon" onclick="mute_sound()"></i>
+                        <input type="range" min="0" max="100" value="90" onchange="change_volume()">
+                    </div>
+                </div>
+        </div>
+
+        right part
+        <div class="right">
+            
+            song_title
+            <p id="title">title.mp3</p>
+            <p id="artist">Artist name</p>
+        </div>
+    </div>
+</div>
+
+    </body> --> 
+
+        </html>
